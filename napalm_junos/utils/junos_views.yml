@@ -16,7 +16,7 @@ junos_iface_view:
   fields:
     is_up: { oper-status: True=up }
     is_enabled: { admin-status: True=up }
-    description: { description: unicode }
+    description: { description: str }
     last_flapped: { interface-flapped/@seconds: int }
     #mode: logical-interface/address-family/address-family-name
     speed: speed
@@ -69,7 +69,7 @@ junos_bgp_view:
     local_as: { local-as: int }
     peer_as: { peer-as: int }
     local_id: local-id
-    remote_id: { peer-id: unicode }
+    remote_id: { peer-id: str }
 
 ####
 #### LLDP table
@@ -207,16 +207,16 @@ junos_lldp_neighbors_detail_table:
 
 junos_lldp_neighbors_detail_view:
   fields:
-    # interface: {lldp-local-port-id: unicode}
-    interface_description: {lldp-local-interface: unicode}
-    parent_interface: {lldp-local-parent-interface-name: unicode}
-    remote_port: {lldp-remote-port-id: unicode}
-    remote_chassis_id: {lldp-remote-chassis-id: unicode}
-    remote_port_description: {lldp-remote-port-description: unicode}
-    remote_system_name: {lldp-remote-system-name: unicode}
-    remote_system_description: {lldp-system-description/lldp-remote-system-description: unicode}
-    remote_system_capab: {lldp-remote-system-capabilities-supported: unicode}
-    remote_system_enable_capab: {lldp-remote-system-capabilities-enabled: unicode}
+    # interface: {lldp-local-port-id: str}
+    interface_description: {lldp-local-interface: str}
+    parent_interface: {lldp-local-parent-interface-name: str}
+    remote_port: {lldp-remote-port-id: str}
+    remote_chassis_id: {lldp-remote-chassis-id: str}
+    remote_port_description: {lldp-remote-port-description: str}
+    remote_system_name: {lldp-remote-system-name: str}
+    remote_system_description: {lldp-system-description/lldp-remote-system-description: str}
+    remote_system_capab: {lldp-remote-system-capabilities-supported: str}
+    remote_system_enable_capab: {lldp-remote-system-capabilities-enabled: str}
 
 ###
 ### BGP config
@@ -338,20 +338,20 @@ junos_bgp_neighbors_view:
     up: {peer-state: True=Established}
     local_as: {local-as: int}
     remote_as: {peer-as: int}
-    router_id: {peer-id: unicode}
+    router_id: {peer-id: str}
     local_address: local-address
     peer_address: peer-address
     options: bgp-option-information/bgp-options
-    import_policy: {bgp-option-information/import-policy: unicode}
-    export_policy: {bgp-option-information/export-policy: unicode}
+    import_policy: {bgp-option-information/import-policy: str}
+    export_policy: {bgp-option-information/export-policy: str}
     input_messages: {input-messages: int}
     output_messages: {output-messages: int}
     input_updates: {input-updates: int}
     output_updates: {output-updates: int}
     messages_queued_out: {bgp-output-queue/count: int}
-    connection_state: {peer-state: unicode}
-    previous_connection_state: {last-state: unicode}
-    last_event: {last-event: unicode}
+    connection_state: {peer-state: str}
+    previous_connection_state: {last-state: str}
+    last_event: {last-event: str}
     4byte_as: {peer-4byte-as-capability-advertised: int}
     local_as_prepend: {peer-addpath-not-supported: False=None}
     holdtime: {active-holdtime: int}
@@ -387,9 +387,9 @@ junos_arp_table:
 
 junos_arp_view:
   fields:
-    interface: {interface-name: unicode}
-    mac: {mac-address: unicode}
-    ip: {ip-address: unicode}
+    interface: {interface-name: str}
+    mac: {mac-address: str}
+    ip: {ip-address: str}
     tte: {time-to-expire: float}
 
 ###
@@ -426,8 +426,8 @@ junos_mac_address_table:
 
 junos_mac_address_view:
   fields:
-    interface: {l2-mac-logical-interface: unicode}
-    mac: {l2-mac-address: unicode}
+    interface: {l2-mac-logical-interface: str}
+    mac: {l2-mac-address: str}
     vlan: {l2-bridge-vlan: int}
 
 # Different table struct & view for EX & QFX series
@@ -445,8 +445,8 @@ junos_mac_address_table_switch:
 
 junos_mac_address_view_switch:
   fields:
-    interface: {mac-interface: unicode}
-    mac: {mac-address: unicode}
+    interface: {mac-interface: str}
+    mac: {mac-address: str}
     vlan: {mac-vlan-tag: int}
     static: {mac-type: True=Static}
 
@@ -480,28 +480,28 @@ junos_route_table_view:
     ###
     ### Common fields
     ###
-    destination: {../../rt-destination: unicode}
+    destination: {../../rt-destination: str}
     prefix_length: {../../rt-prefix-length: int}
-    protocol: {../protocol-name: unicode}
+    protocol: {../protocol-name: str}
     current_active: {../current-active: True=current-active}
     last_active: {../last-active: True=last-active}
     age: {../age/@seconds: int}
-    next_hop: {to: unicode}
-    outgoing_interface: {via: unicode}
+    next_hop: {to: str}
+    outgoing_interface: {via: str}
     selected_next_hop: {selected-next-hop: True=selected-next-hop}
     preference: {../preference: int}
-    inactive_reason: {../inactive-reason: unicode}
-    routing_table: {../../../table-name: unicode}
+    inactive_reason: {../inactive-reason: str}
+    routing_table: {../../../table-name: str}
     ###
     ### BGP Specific fields
     ###
-    as_path: {../as-path: unicode}
+    as_path: {../as-path: str}
     local_as: {../local-as: int}
     remote_as: {../peer-as: int}
     local_preference: {../local-preference: int}
-    communities: {../communities/community: unicode}
+    communities: {../communities/community: str}
     preference2: {../preference2: int}
-    remote_address: {../peer-id: unicode}
+    remote_address: {../peer-id: str}
     metric: {../metric: int}
     metric2: {../metric2: int}
     ###
@@ -554,10 +554,10 @@ junos_rpm_probes_results_table:
 
 junos_rpm_probes_results_view:
   fields:
-    test_name: {test-name: unicode}
-    target: {target-address: unicode}
-    source: {source-address: unicode}
-    probe_type: {probe-type: unicode}
+    test_name: {test-name: str}
+    target: {target-address: str}
+    source: {source-address: str}
+    probe_type: {probe-type: str}
     probe_count: {test-size: int}
     rtt: {probe-single-results/rtt: float}
     round_trip_jitter: {probe-single-results/round-trip-jitter: float}
