@@ -12,5 +12,5 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-"""napalm_iosxr package."""
-from junos import JunOSDriver
+"""napalm_junos package."""
+from napalm_junos.junos import JunOSDriver
