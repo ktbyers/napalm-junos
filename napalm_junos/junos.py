@@ -169,11 +169,11 @@ class JunOSDriver(NetworkDriver):
 
         return {
             'vendor': u'Juniper',
-            'model': unicode(output['model']),
-            'serial_number': unicode(output['serialnumber']),
-            'os_version': unicode(output['version']),
-            'hostname': unicode(output['hostname']),
-            'fqdn': unicode(output['fqdn']),
+            'model': output['model'],
+            'serial_number': output['serialnumber'],
+            'os_version': output['version'],
+            'hostname': output['hostname'],
+            'fqdn': output['fqdn'],
             'uptime': string_parsers.convert_uptime_string_seconds(uptime),
             'interface_list': interface_list
         }
@@ -193,7 +193,7 @@ class JunOSDriver(NetworkDriver):
                 'is_enabled': interfaces[iface]['is_enabled'],
                 'description': (interfaces[iface]['description'] or u''),
                 'last_flapped': float((interfaces[iface]['last_flapped'] or -1)),
-                'mac_address': unicode((interfaces[iface]['mac_address'] or '')),
+                'mac_address': (interfaces[iface]['mac_address'] or ''),
                 'speed': -1
             }
             # result[iface]['last_flapped'] = float(result[iface]['last_flapped'])
@@ -344,7 +344,7 @@ class JunOSDriver(NetworkDriver):
     @staticmethod
     def _parse_value(value):
         if isinstance(value, basestring):
-            return unicode(value)
+            return value
         elif value is None:
             return u''
         else:
@@ -367,7 +367,7 @@ class JunOSDriver(NetworkDriver):
                 peer_ip = neighbor.split('+')[0]
                 if 'router_id' not in bgp_neighbor_data[instance_name]:
                     # we only need to set this once
-                    bgp_neighbor_data[instance_name]['router_id'] = unicode(neighbor_data['local_id'])
+                    bgp_neighbor_data[instance_name]['router_id'] = neighbor_data['local_id']
                 peer = {key:self._parse_value(value) for key, value in neighbor_data.iteritems() if key in keys}
                 peer['address_family'] = self._parse_route_stats(neighbor_data)
                 bgp_neighbor_data[instance_name]['peers'][peer_ip] = peer
@@ -388,7 +388,7 @@ class JunOSDriver(NetworkDriver):
         for neigh in result:
             if neigh[0] not in neighbors.keys():
                 neighbors[neigh[0]] = list()
-            neighbors[neigh[0]].append({x[0]: unicode(x[1]) for x in neigh[1]})
+            neighbors[neigh[0]].append({x[0]: x[1] for x in neigh[1]})
 
         return neighbors
 
@@ -419,7 +419,7 @@ class JunOSDriver(NetworkDriver):
                     'parent_interface'          : item.parent_interface,
                     'remote_port'               : item.remote_port,
                     'remote_chassis_id'         : item.remote_chassis_id,
-                    'remote_port_description'   : convert(unicode, item.remote_port_description),
+                    'remote_port_description'   : item.remote_port_description,
                     'remote_system_name'        : item.remote_system_name,
                     'remote_system_description' : item.remote_system_description,
                     'remote_system_capab'       : item.remote_system_capab,
@@ -438,9 +438,9 @@ class JunOSDriver(NetworkDriver):
 
         for command in commands:
             try:
-                cli_output[unicode(command)] = unicode(self.device.cli(command))
+                cli_output[command] = self.device.cli(command)
             except Exception as e:
-                cli_output[unicode(command)] = 'Unable to execute command "{cmd}": {err}'.format(
+                cli_output[command] = 'Unable to execute command "{cmd}": {err}'.format(
                     cmd = command,
                     err = e
                 )
@@ -507,12 +507,12 @@ class JunOSDriver(NetworkDriver):
             return prefix_limit
 
         _COMMON_FIELDS_DATATYPE_ = {
-            'description': unicode,
-            'local_address': unicode,
+            'description': str,
+            'local_address': str,
             'local_as': int,
             'remote_as': int,
-            'import_policy': unicode,
-            'export_policy': unicode,
+            'import_policy': str,
+            'export_policy': str,
             'inet_unicast_limit_prefix_limit': int,
             'inet_unicast_teardown_threshold_prefix_limit': int,
             'inet_unicast_teardown_timeout_prefix_limit': int,
@@ -520,7 +520,7 @@ class JunOSDriver(NetworkDriver):
             'inet_flow_limit_prefix_limit': int,
             'inet_flow_teardown_threshold_prefix_limit': int,
             'inet_flow_teardown_timeout_prefix_limit': int,
-            'inet_flow_novalidate_prefix_limit': unicode,
+            'inet_flow_novalidate_prefix_limit': str,
             'inet6_unicast_limit_prefix_limit': int,
             'inet6_unicast_teardown_threshold_prefix_limit': int,
             'inet6_unicast_teardown_timeout_prefix_limit': int,
@@ -528,12 +528,12 @@ class JunOSDriver(NetworkDriver):
             'inet6_flow_limit_prefix_limit': int,
             'inet6_flow_teardown_threshold_prefix_limit': int,
             'inet6_flow_teardown_timeout_prefix_limit': int,
-            'inet6_flow_novalidate_prefix_limit': unicode,
+            'inet6_flow_novalidate_prefix_limit': str,
         }
 
         _PEER_FIELDS_DATATYPE_MAP_ = {
-            'group': unicode,
-            'authentication_key': unicode,
+            'group': str,
+            'authentication_key': str,
             'route_reflector_client': bool,
             'nhs': bool
         }
@@ -542,7 +542,7 @@ class JunOSDriver(NetworkDriver):
         )
 
         _GROUP_FIELDS_DATATYPE_MAP_ = {
-            'type': unicode,
+            'type': str,
             'apply_groups': list,
             'remove_private_as': bool,
             'multipath': bool,
@@ -553,7 +553,7 @@ class JunOSDriver(NetworkDriver):
         )
 
         _DATATYPE_DEFAULT_ = {
-            unicode: u'',
+            str: '',
             int: 0,
             bool: False,
             list: []
@@ -726,7 +726,7 @@ class JunOSDriver(NetworkDriver):
             four_byte_as = neighbor_details.pop('4byte_as', 0)
             local_address = neighbor_details.pop('local_address', '')
             local_details = local_address.split('+')
-            neighbor_details['local_address'] = unicode(local_details[0])
+            neighbor_details['local_address'] = local_details[0]
             if len(local_details) == 2:
                 neighbor_details['local_port'] = int(local_details[1])
             else:
@@ -734,7 +734,7 @@ class JunOSDriver(NetworkDriver):
             neighbor_details['suppress_4byte_as'] = (remote_as != four_byte_as)
             peer_address = neighbor_details.pop('peer_address', '')
             remote_details = peer_address.split('+')
-            neighbor_details['remote_address'] = unicode(remote_details[0])
+            neighbor_details['remote_address'] = remote_details[0]
             if len(remote_details) == 2:
                 neighbor_details['remote_port'] = int(remote_details[1])
             else:
@@ -742,7 +742,7 @@ class JunOSDriver(NetworkDriver):
             neighbors_rib = neighbor_details.pop('rib')
             neighbors_rib_items = neighbors_rib.items()
             for rib_entry in neighbors_rib_items:
-                _table = unicode(rib_entry[0])
+                _table = rib_entry[0]
                 if _table not in bgp_neighbors.keys():
                     bgp_neighbors[_table] = {}
                 if remote_as not in bgp_neighbors[_table].keys():
@@ -751,7 +751,7 @@ class JunOSDriver(NetworkDriver):
                 neighbor_rib_details.update({
                     elem[0]:elem[1] for elem in rib_entry[1]
                 })
-                neighbor_rib_details['routing_table'] = unicode(_table)
+                neighbor_rib_details['routing_table'] = _table
                 bgp_neighbors[_table][remote_as].append(neighbor_rib_details)
 
         return bgp_neighbors
@@ -785,37 +785,26 @@ class JunOSDriver(NetworkDriver):
         return arp_table
 
     def get_ntp_peers(self):
-
         ntp_table = junos_views.junos_ntp_peers_config_table(self.device)
         ntp_table.get()
-
         ntp_peers = ntp_table.items()
-
         if not ntp_peers:
             return {}
-
-        return {unicode(peer[0]):{} for peer in ntp_peers}
+        return {peer[0]: {} for peer in ntp_peers}
 
     def get_ntp_servers(self):
-
         ntp_table = junos_views.junos_ntp_servers_config_table(self.device)
         ntp_table.get()
-
         ntp_servers = ntp_table.items()
-
         if not ntp_servers:
             return {}
-
-        return {unicode(server[0]):{} for server in ntp_servers}
+        return {server[0]: {} for server in ntp_servers}
 
     def get_ntp_stats(self):
-
         # NTP Peers does not have XML RPC defined
         # thus we need to retrieve raw text and parse...
         # :(
-
         ntp_stats = list()
-
         REGEX = (
             '^\s?(\+|\*|x|-)?([a-zA-Z0-9\.+-:]+)'
             '\s+([a-zA-Z0-9\.]+)\s+([0-9]{1,2})'
@@ -834,12 +823,12 @@ class JunOSDriver(NetworkDriver):
             line_groups = line_search.groups()
             try:
                 ntp_stats.append({
-                    'remote'        : unicode(line_groups[1]),
+                    'remote'        : line_groups[1],
                     'synchronized'  : (line_groups[0] == '*'),
-                    'referenceid'   : unicode(line_groups[2]),
+                    'referenceid'   : line_groups[2],
                     'stratum'       : int(line_groups[3]),
-                    'type'          : unicode(line_groups[4]),
-                    'when'          : unicode(line_groups[5]),
+                    'type'          : line_groups[4],
+                    'when'          : line_groups[5],
                     'hostpoll'      : int(line_groups[6]),
                     'reachability'  : int(line_groups[7]),
                     'delay'         : float(line_groups[8]),
@@ -868,9 +857,9 @@ class JunOSDriver(NetworkDriver):
         for interface_details in interface_table_items:
             try:
                 ip_address = interface_details[0]
-                address    = unicode(ip_address.split('/')[0])
+                address    = ip_address.split('/')[0]
                 prefix     = self._convert(int, ip_address.split('/')[-1], 0)
-                interface  = unicode(interface_details[1][0][1])
+                interface  = interface_details[1][0][1]
                 family_raw = interface_details[1][1][1]
                 family     = _FAMILY_VMAP_.get(family_raw)
                 if not family:
@@ -1010,7 +999,7 @@ class JunOSDriver(NetworkDriver):
             communities = d.get('communities')
             if communities is not None and type(communities) is not list:
                 d['communities'] = [communities]
-            d['next_hop'] = unicode(next_hop)
+            d['next_hop'] = next_hop
             d_keys = d.keys()
             # fields that are not in _COMMON_PROTOCOL_FIELDS_ are supposed to be protocol specific
             all_protocol_attributes = {key: d.pop(key) for key in d_keys if key not in _COMMON_PROTOCOL_FIELDS_}
@@ -1050,18 +1039,18 @@ class JunOSDriver(NetworkDriver):
             })
 
         snmp_information = {
-            'contact': self._convert(unicode, communities[0].get('contact')),
-            'location': self._convert(unicode, communities[0].get('location')),
-            'chassis_id': self._convert(unicode, communities[0].get('chassis')),
+            'contact': communities[0].get('contact', 'None'),
+            'location': communities[0].get('location', 'None'),
+            'chassis_id': communities[0].get('chassis', 'None'),
             'community': {}
         }
 
         for snmp_entry in communities:
-            name = self._convert(unicode, snmp_entry.get('name'))
-            authorization = self._convert(unicode, snmp_entry.get('authorization'))
+            name = snmp_entry.get('name', 'None')
+            authorization = snmp_entry.get('authorization', 'None')
             snmp_information['community'][name] = {
-                'mode': _AUTHORIZATION_MODE_MAP_.get(authorization, u''),
-                'acl': u''
+                'mode': _AUTHORIZATION_MODE_MAP_.get(authorization, ''),
+                'acl': ''
             }
 
         return snmp_information
@@ -1076,16 +1065,16 @@ class JunOSDriver(NetworkDriver):
         probes_table_items = probes_table.items()
 
         for probe_test in probes_table_items:
-            test_name = unicode(probe_test[0])
+            test_name = probe_test[0]
             test_details = {
                 p[0]: p[1] for p in probe_test[1]
             }
-            probe_name = self._convert(unicode, test_details.pop('probe_name'))
-            target = self._convert(unicode, test_details.pop('target', ''))
+            probe_name = test_details.pop('probe_name')
+            target = test_details.pop('target', '')
             test_interval = self._convert(int, test_details.pop('test_interval', '0'))
             probe_count = self._convert(int, test_details.pop('probe_count', '0'))
-            probe_type = self._convert(unicode, test_details.pop('probe_type', ''))
-            source = self._convert(unicode, test_details.pop('source_address', ''))
+            probe_type = test_details.pop('probe_type', '')
+            source = test_details.pop('source_address', '')
             if probe_name not in probes.keys():
                 probes[probe_name] = dict()
             probes[probe_name][test_name] = {
@@ -1108,7 +1097,7 @@ class JunOSDriver(NetworkDriver):
         probes_results_items = probes_results_table.items()
 
         for probe_result in probes_results_items:
-            probe_name = unicode(probe_result[0])
+            probe_name = probe_result[0]
             test_results = {
                 p[0]: p[1] for p in probe_result[1]
             }
@@ -1170,8 +1159,8 @@ class JunOSDriver(NetworkDriver):
                 traceroute_result['success'][ttl_value] = {'probes': {}}
             for probe in hop.findall('probe-result'):
                 probe_index = self._convert(int, self._find_txt(probe, 'probe-index'), 0)
-                ip_address = unicode(self._find_txt(probe, 'ip-address', u'*'))
-                host_name = unicode(self._find_txt(probe, 'host-name', u'*'))
+                ip_address = self._find_txt(probe, 'ip-address', '*')
+                host_name = self._find_txt(probe, 'host-name', '*')
                 rtt = self._convert(float, self._find_txt(probe, 'rtt'), 0) * 1e-3 # ms
                 traceroute_result['success'][ttl_value]['probes'][probe_index] = {
                     'ip_address': ip_address,
