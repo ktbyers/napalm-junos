@@ -146,7 +146,7 @@ class JunOSDriver(NetworkDriver):
 
 
     @staticmethod
-    def _convert(to, who, default = u''):
+    def _convert(to, who, default = ''):
         if who is None:
             return default
         try:
@@ -168,7 +168,7 @@ class JunOSDriver(NetworkDriver):
         interface_list = interfaces.keys()
 
         return {
-            'vendor': u'Juniper',
+            'vendor': 'Juniper',
             'model': output['model'],
             'serial_number': output['serialnumber'],
             'os_version': output['version'],
@@ -191,14 +191,14 @@ class JunOSDriver(NetworkDriver):
             result[iface] = {
                 'is_up': interfaces[iface]['is_up'],
                 'is_enabled': interfaces[iface]['is_enabled'],
-                'description': (interfaces[iface]['description'] or u''),
+                'description': (interfaces[iface]['description'] or ''),
                 'last_flapped': float((interfaces[iface]['last_flapped'] or -1)),
                 'mac_address': (interfaces[iface]['mac_address'] or ''),
                 'speed': -1
             }
             # result[iface]['last_flapped'] = float(result[iface]['last_flapped'])
 
-            match = re.search(r'(\d+)(\w*)', interfaces[iface]['speed'] or u'')
+            match = re.search(r'(\d+)(\w*)', interfaces[iface]['speed'] or '')
             if match is None:
                 continue
             speed_value = self._convert(int, match.group(1), -1)
@@ -346,7 +346,7 @@ class JunOSDriver(NetworkDriver):
         if isinstance(value, basestring):
             return value
         elif value is None:
-            return u''
+            return ''
         else:
             return value
 
